@@ -1,0 +1,61 @@
+cntk:
+    name: {gpu: cntk-gpu, cpu: cntk}
+    version:
+        cuda80: 2.3.1
+        cuda90: 2.5.1
+        cpu: 2.5.1
+
+scipy:
+    numpy: {name: numpy, version: 1.14.2}
+    scipy: {name: scipy, version: 1.0.1}
+
+tensorflow:
+    name: {gpu: tensorflow-gpu, cpu: tensorflow}
+    version:
+        cuda80: {win: 1.4.0, linux: 1.4.1}
+        cuda90: 1.5.0
+        cpu: 1.5.0
+
+pytorch:
+    torch: {name: torch, version: 0.4.0}
+    torchvision: {name: torchvision, version: ~}
+
+Keras:
+    name: Keras
+    version: 2.1.5
+
+caffe2:
+    name: caffe2
+    version: 0.8.1
+
+Theano:
+    name: Theano
+    version: 1.0.1
+
+mxnet:
+    name:
+        gpu: {cuda80: mxnet-cu80, cuda90: mxnet-cu90}
+        cpu: mxnet
+    version: 1.1.0.post0
+
+chainer:
+    cupy: {name: cupy, version: 4.0.0}
+    chainer: {name: chainer, version: 4.0.0}
+    chainermn: {name: chainermn, version: ~}
+
+converter:
+    coremltools: {name: coremltools, version: ~}
+    onnx: {name: onnx, version: 1.1.2}
+    tf2onnx: {name: tf2onnx, version: 0.0.0.1}
+    onnxmltools: {name: onnxmltools, version: ~}
+    winmltools: {name: winmltools, version: ~}
+
+ml_software:
+    scikit-learn: {name: scikit-learn, version: 0.19.1}
+    xgboost: {name: xgboost, version: 0.71}
+    libsvm: {name: libsvm, version: 3.22}
+
+extra_software:
+    jupyter: {name: jupyter, version: ~}
+    matplotlib: {name: matplotlib, version: ~}
+    pandas: {name: pandas, version: ~}
