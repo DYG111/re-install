@@ -37,28 +37,28 @@ def set_options():
 # ShellExecuteInfo
 if platform.system() == "Windows":
     from ctypes.wintypes import HANDLE, BOOL, DWORD, HWND, HINSTANCE, HKEY
-class ShellExecuteInfo(ctypes.Structure):
-    _fields_ = [('cbSize', DWORD),
-                ('fMask', ctypes.c_ulong),
-                ('hwnd', HWND),
-                ('lpVerb', ctypes.c_char_p),
-                ('lpFile', ctypes.c_char_p),
-                ('lpParameters', ctypes.c_char_p),
-                ('lpDirectory', ctypes.c_char_p),
-                ('nShow', ctypes.c_int),
-                ('hInstApp', HINSTANCE),
-                ('lpIDList', ctypes.c_void_p),
-                ('lpClass', ctypes.c_char_p),
-                ('hKeyClass', HKEY),
-                ('dwHotKey', DWORD),
-                ('hIcon', HANDLE),
-                ('hProcess', HANDLE)]
+    class ShellExecuteInfo(ctypes.Structure):
+        _fields_ = [('cbSize', DWORD),
+                    ('fMask', ctypes.c_ulong),
+                    ('hwnd', HWND),
+                    ('lpVerb', ctypes.c_char_p),
+                    ('lpFile', ctypes.c_char_p),
+                    ('lpParameters', ctypes.c_char_p),
+                    ('lpDirectory', ctypes.c_char_p),
+                    ('nShow', ctypes.c_int),
+                    ('hInstApp', HINSTANCE),
+                    ('lpIDList', ctypes.c_void_p),
+                    ('lpClass', ctypes.c_char_p),
+                    ('hKeyClass', HKEY),
+                    ('dwHotKey', DWORD),
+                    ('hIcon', HANDLE),
+                    ('hProcess', HANDLE)]
 
-    def __init__(self, **kw):
-        ctypes.Structure.__init__(self)
-        self.cbSize = ctypes.sizeof(self)
-        for name, value in kw.items():
-            setattr(self, name, value)
+        def __init__(self, **kw):
+            ctypes.Structure.__init__(self)
+            self.cbSize = ctypes.sizeof(self)
+            for name, value in kw.items():
+                setattr(self, name, value)
 
 class SysInfo(object):
     os = None
