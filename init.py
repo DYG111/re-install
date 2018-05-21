@@ -3,8 +3,7 @@ import logging
 import sys
 import argparse
 import ctypes
-from ctypes.wintypes import HANDLE, BOOL, DWORD, HWND, HINSTANCE, HKEY
-
+import platform
 TOOLSFORAI_OS_WIN = "win"
 TOOLSFORAI_OS_LINUX = "linux"
 TOOLSFORAI_OS_MACOS = "mac"
@@ -36,6 +35,8 @@ def set_options():
     return args, unknown
 
 # ShellExecuteInfo
+if platform.system() == "Windows":
+    from ctypes.wintypes import HANDLE, BOOL, DWORD, HWND, HINSTANCE, HKEY
 class ShellExecuteInfo(ctypes.Structure):
     _fields_ = [('cbSize', DWORD),
                 ('fMask', ctypes.c_ulong),

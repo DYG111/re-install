@@ -10,8 +10,9 @@ import platform
 import re
 import subprocess
 import sys
-import winreg
 import yaml
+if platform.system() == "Windows":
+    import winreg
 
 # detect
 def detect_os():
