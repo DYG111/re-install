@@ -42,14 +42,14 @@ def detect_gpu():
     gpu_detector_name = 'gpu_detector_' + SysInfo.os
     if (SysInfo.os == TOOLSFORAI_OS_WIN):
         gpu_detector_name = gpu_detector_name + '.exe'
-    gpu_detector_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), gpu_detector_name)
+    gpu_detector_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "tools", gpu_detector_name)
 
     if not (os.path.isfile(gpu_detector_path)):
         logger.error(
             'Not find GPU detector. Please make sure {0} is in the same directory with the installer script.'.format(
                 gpu_detector_name))
         return False
-        SysInfo.gpu, return_stdout = _run_cmd(gpu_detector_path, return_stdout=True)
+    SysInfo.gpu, return_stdout = _run_cmd(gpu_detector_path, return_stdout=True)
     if not SysInfo.gpu:
         return_stdout = 'None'
     logger.info('NVIDIA GPU: {0}'.format(return_stdout))
@@ -98,26 +98,26 @@ def detect_cuda():
         status, stdout = _run_cmd("nvcc", ["-V"], True)
         if status and re.search(r"release\s*8.0,\s*V8.0", stdout):
             SysInfo.cuda = "8.0"
-            logger.info("Cuda: {0}".format(SysInfo.cuda))
+            logger.info("CUDA: {0}".format(SysInfo.cuda))
             if SysInfo.cuda80:
                 logger.warning(
-                    "Detect parameter '--cuda80', the installer script will be forced to install dependency package for cuda 8.0.")
+                    "Detect parameter '--cuda80', the installer script will be forced to install dependency package for CUDA 8.0.")
                 return True
             else:
-                logger.warning("We recommend cuda 9.0 (https://developer.nvidia.com/cuda-toolkit)."
-                               "If you want to install dependency package for cuda 8.0, please run the installer script with '--cuda80' again.")
+                logger.warning("We recommend CUDA 9.0 (https://developer.nvidia.com/cuda-toolkit)."
+                               "If you want to install dependency package for CUDA 8.0, please run the installer script with '--cuda80' again.")
                 return False
         elif status and re.search(r"release\s*9.0,\s*V9.0", stdout):
             SysInfo.cuda = "9.0"
-            logger.info("Cuda: {0}".format(SysInfo.cuda))
+            logger.info("CUDA: {0}".format(SysInfo.cuda))
         else:
             SysInfo.cuda = "9.0"
-            logger.warning("Not detect cuda! We recommend cuda 9.0 (https://developer.nvidia.com/cuda-toolkit). "
-                           "The installer script will install dependency package for cuda 9.0 by default.")
+            logger.warning("Not detect CUDA! We recommend CUDA 9.0 (https://developer.nvidia.com/cuda-toolkit). "
+                           "The installer script will install dependency package for CUDA 9.0 by default.")
         if SysInfo.cuda80:
             SysInfo.cuda = "8.0"
             logger.warning(
-                "Detect parameter '--cuda80', the installer script will be forced to install dependency package for cuda 8.0.")
+                "Detect parameter '--cuda80', the installer script will be forced to install dependency package for CUDA 8.0.")
         return True
     else:
         return True
@@ -137,9 +137,9 @@ def detect_cudnn_win():
         status, cudnn = _run_cmd(cmd, args, True)
         if status and next(filter(os.path.isfile, cudnn.split('\n')), None):
             SysInfo.cudnn = version
-            logger.info("Cudnn: {0}".format(version))
+            logger.info("cuDNN: {0}".format(version))
     if not SysInfo.cudnn:
-        logger.warning("Not detect cudnn! We recommand cudnn 7, please download and install cudnn 7 from https://developer.nvidia.com/rdp/cudnn-download.")
+        logger.warning("Not detect cuDNN! We recommand cuDNN 7, please download and install cuDNN 7 from https://developer.nvidia.com/rdp/cudnn-download.")
 
 def detect_mpi_win():
     target_version = "7.0.12437.6"
@@ -393,6 +393,7 @@ def set_options():
                         help="add extra options for packages installation. --user ignored if this option is supplied.")
 
 def rd_config():
-    with open("config.yaml") as f:
+    config_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config", "config.yaml")
+    with open(config_path) as f:
         pkg_info = yaml.load(f)
         return pkg_info

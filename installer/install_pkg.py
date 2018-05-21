@@ -4,6 +4,7 @@ from init import SysInfo
 from init import logger
 import utils
 
+
 import importlib
 import subprocess
 import sys
@@ -157,6 +158,8 @@ def pip_install_package(name, options, version, pkg=None):
             else:
                 pkg = name
                 version = ""
+        if not version:
+            version = ""
         logger.info("Begin to pip-install {0} {1} ...".format(name, version))
         logger.debug("pkg : {0}".format(pkg))
         res = -1
@@ -207,7 +210,7 @@ def pip_install_cntk(pkg_info, options):
             pkg = "https://cntk.ai/PythonWheel/{0}/cntk-{1}-cp{2}-cp{2}m-{3}.whl".format(gpu_type, version, wheel_ver, arch)
             return pip_install_package(name, options, version, pkg)
         elif SysInfo.cuda == "9.0":
-            version = pkg_info["cntk"]["cuda90"]
+            version = pkg_info["cntk"]["version"]["cuda90"]
             return pip_install_package(name, options, version)
     else:
         name = pkg_info["cntk"]["name"]["cpu"]
