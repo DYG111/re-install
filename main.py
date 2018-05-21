@@ -1,9 +1,9 @@
 #coding=utf-8
-from installer.init import TOOLSFORAI_OS_LINUX, TOOLSFORAI_OS_WIN, TOOLSFORAI_OS_MACOS
-from installer.init import SysInfo
-from installer.init import logger, set_options
-import installer.utils as utils
-import installer.install_pkg as install_pkg
+from init import TOOLSFORAI_OS_LINUX, TOOLSFORAI_OS_WIN
+from init import SysInfo
+from init import logger, set_options
+import utils
+import install_pkg
 
 import logging
 import os
@@ -35,7 +35,7 @@ def main():
         target_dir = os.path.sep.join([os.path.expanduser('~'), '.toolsforai', 'RuntimeSDK'])
 
     try:
-        _thread.start_new_thread(install_pkg.install_cntk, (target_dir, ))
+        _thread.start_new_thread(install_pkg.install_cntk, (target_dir,))
     except:
         logger.error("Fail to startup install_cntk thread!")
 

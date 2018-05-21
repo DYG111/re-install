@@ -1,7 +1,7 @@
 #coding=utf-8
-from installer.init import TOOLSFORAI_OS_LINUX, TOOLSFORAI_OS_WIN, TOOLSFORAI_OS_MACOS
-from installer.init import SysInfo, ShellExecuteInfo
-from installer.init import logger
+from init import TOOLSFORAI_OS_LINUX, TOOLSFORAI_OS_WIN, TOOLSFORAI_OS_MACOS
+from init import SysInfo, ShellExecuteInfo
+from init import logger
 
 import argparse
 import ctypes

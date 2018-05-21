@@ -1,8 +1,8 @@
 #coding=utf-8
-from installer.init import TOOLSFORAI_OS_LINUX, TOOLSFORAI_OS_WIN, TOOLSFORAI_OS_MACOS
-from installer.init import SysInfo
-from installer.init import logger
-import installer.utils as utils
+from init import TOOLSFORAI_OS_LINUX, TOOLSFORAI_OS_WIN, TOOLSFORAI_OS_MACOS
+from init import SysInfo
+from init import logger
+import utils
 
 
 import importlib
@@ -65,7 +65,8 @@ def install_cntk(target_dir):
             # fail_install.append("CNTK(BrainScript)")
             return False
 
-    if (not (utils._unzip_file(download_dir, target_dir) if SysInfo.os == TOOLSFORAI_OS_WIN else utils._extract_tar(download_dir, target_dir))):
+    if (not (
+    utils._unzip_file(download_dir, target_dir) if SysInfo.os == TOOLSFORAI_OS_WIN else utils._extract_tar(download_dir, target_dir))):
         logger.error('Fail to install CNTK(BrainScript), the error message: cannot decompress the downloaded package.')
         # fail_install.append("CNTK(BrainScript)")
         return False
