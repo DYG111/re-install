@@ -1,8 +1,8 @@
 #coding=utf-8
-from init import TOOLSFORAI_OS_LINUX, TOOLSFORAI_OS_WIN, TOOLSFORAI_OS_MACOS
-from init import SysInfo
-from init import logger
-import utils
+from installer.init import TOOLSFORAI_OS_LINUX, TOOLSFORAI_OS_WIN, TOOLSFORAI_OS_MACOS
+from installer.init import SysInfo
+from installer.init import logger
+import installer.utils as utils
 
 
 import importlib
