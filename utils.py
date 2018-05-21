@@ -1,7 +1,8 @@
 #coding=utf-8
 from init import TOOLSFORAI_OS_LINUX, TOOLSFORAI_OS_WIN, TOOLSFORAI_OS_MACOS
-from init import SysInfo, ShellExecuteInfo
+from init import SysInfo
 from init import logger
+
 
 import argparse
 import ctypes
@@ -13,6 +14,7 @@ import sys
 import yaml
 if platform.system() == "Windows":
     import winreg
+    from init import ShellExecuteInfo
 
 # detect
 def detect_os():
