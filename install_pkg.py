@@ -277,7 +277,7 @@ def pip_install_keras(pkg_info, options):
 
 def pip_install_caffe2(pkg_info, options):
     if not (SysInfo.os == TOOLSFORAI_OS_WIN):
-        logger.warning("In non-Windows OS, you need to manually install caffe2 from source.")
+        logger.warning("Fail to install caffe2. In non-Windows OS, you should manually install caffe2 from source.")
         return
     name = pkg_info["caffe2"]["name"]
     version = pkg_info["caffe2"]["version"]
@@ -332,7 +332,7 @@ def pip_install_chainer(pkg_info, options):
     name = pkg_info["chainer"]["chainermn"]["name"]
     version = pkg_info["chainer"]["chainermn"]["version"]
     if not pip_install_package(name, options, version):
-        logger.warning("On Linux, in order to install chainermn, please manually install libmpich-dev and run installer script again.")
+        logger.warning("On Linux, in order to install chainermn, please first manually install libmpich-dev and then run installer script again.")
 
 def pip_install_converter(pkg_info, options):
     logger.info("Begin to install converter(coremltools, onnx, tf2onnx, onnxmltools and winmltools) ...")
@@ -398,8 +398,8 @@ def pip_install_ml_software(pkg_info, options):
     name = pkg_info["ml_software"]["xgboost"]["name"]
     version = pkg_info["ml_software"]["xgboost"]["version"]
     if SysInfo.os != TOOLSFORAI_OS_WIN:
-        logger.warning("In order to install xgboost, C++ compiler is needed.")
-        pip_install_package(name, options, version)
+        if not pip_install_package(name, options, version):
+            logger.warning("In order to install xgboost, C++ compiler is needed.")
     else:
         wheel_ver = SysInfo.python
         arch = "win_amd64"
@@ -411,7 +411,7 @@ def pip_install_ml_software(pkg_info, options):
     version = pkg_info["ml_software"]["libsvm"]["version"]
     if SysInfo.os != TOOLSFORAI_OS_WIN:
         logger.warning(
-            "On Linux or Mac, in order to install {0}=={1}, please manually download source code and install it.".format(
+            "Fail to install libsvm. On Linux or Mac, in order to install {0}=={1}, please manually download source code and install it.".format(
                 name, version))
     else:
         wheel_ver = SysInfo.python
