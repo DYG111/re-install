@@ -1,3 +1,4 @@
+# package details
 cntk:
     name: {gpu: cntk-gpu, cpu: cntk}
     version:

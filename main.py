@@ -2,8 +2,8 @@
 from init import TOOLSFORAI_OS_LINUX, TOOLSFORAI_OS_WIN
 from init import SysInfo
 from init import logger, set_options
-import utils
 import install_pkg
+import utils
 
 import logging
 import os
@@ -45,8 +45,6 @@ def main():
     utils.fix_directory_ownership()
     install_res = "/".join(SysInfo.fail_install)
     logger.info("Fail to install {0}. Please try to run installer script again!".format(install_res))
-    # for pkg in SysInfo.fail_install:
-    #     logger.info("Fail to install {0}. Please try to run installer script again!".format(pkg))
     logger.info('Setup finishes.')
     input('Press enter to exit.')
 

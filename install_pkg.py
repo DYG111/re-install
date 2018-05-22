@@ -4,12 +4,11 @@ from init import SysInfo
 from init import logger
 import utils
 
-
 import importlib
-import subprocess
-import sys
 import os
 import shutil
+import subprocess
+import sys
 
 def install_cntk(target_dir):
     logger.info("Begin to install CNTK(BrainScript) ...")

@@ -1,9 +1,10 @@
 #coding=utf-8
-import logging
-import sys
 import argparse
 import ctypes
+import logging
 import platform
+import sys
+
 TOOLSFORAI_OS_WIN = "win"
 TOOLSFORAI_OS_LINUX = "linux"
 TOOLSFORAI_OS_MACOS = "mac"

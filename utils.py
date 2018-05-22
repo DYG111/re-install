@@ -3,7 +3,6 @@ from init import TOOLSFORAI_OS_LINUX, TOOLSFORAI_OS_WIN, TOOLSFORAI_OS_MACOS
 from init import SysInfo
 from init import logger
 
-
 import argparse
 import ctypes
 import os
@@ -12,6 +11,7 @@ import re
 import subprocess
 import sys
 import yaml
+
 if platform.system() == "Windows":
     import winreg
     from init import ShellExecuteInfo
@@ -186,7 +186,6 @@ def module_exists(module_name):
     except:
         return False
 
-
 # read, write and delete registry
 def _registry_read(hkey, keypath, value_name):
     try:
@@ -228,7 +227,6 @@ def _registry_delete(hkey, keypath, name):
     except Exception as e:
         logger.debug("Fail to delete registry key: {0}, name: {1},  unexpected error: {2}".format(keypath, name, e))
         return False
-
 
 # run cmd
 def _run_cmd(cmd, args=[], return_stdout=False):
@@ -276,7 +274,6 @@ def _run_cmd_admin(cmd, param, wait=True):
     except Exception as e:
         # logger.error("Fail to run command {0} as admin, unexpected error: {1}".format(cmd, e))
         logger.error("Fail to run command {0} as admin, unexpected error! Please try to run installer script again!".format(cmd))
-
 
 # download, extract file
 def _download_file(url, local_path):
@@ -384,16 +381,6 @@ def fix_directory_ownership():
     # On Linux, if users install with "sudo", then ~/.toolsforai will have wrong directory ownership.
     target_dir = os.path.sep.join([os.path.expanduser('~'), '.toolsforai'])
     set_ownership_as_login(target_dir)
-
-def set_options():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-v", "--verbose", help="give more output to debug log level.", action="store_true")
-    parser.add_argument("-u", "--user", help="install to the Python user install directory for your platform.",
-                        action="store_true")
-    parser.add_argument("--cuda80", help="forcing the installation of the dependency packages for cuda 8.0.",
-                        action="store_true")
-    parser.add_argument("-o", "--options",
-                        help="add extra options for packages installation. --user ignored if this option is supplied.")
 
 def rd_config():
     config_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config", "config.yaml")
