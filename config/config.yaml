@@ -40,7 +40,11 @@ mxnet:
     version: 1.1.0.post0
 
 chainer:
-    cupy: {name: cupy, version: 4.0.0}
+    cupy:
+        name:
+            win: cupy
+            linux: {cuda80: cupy-cuda80, cuda90: cupy-cuda90, other: cupy}
+        version: 4.0.0
     chainer: {name: chainer, version: 4.0.0}
     chainermn: {name: chainermn, version: ~}
 

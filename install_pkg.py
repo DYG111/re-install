@@ -310,12 +310,18 @@ def pip_install_mxnet(pkg_info, options):
 def pip_install_chainer(pkg_info, options):
     # cupy installation for GPU linux
     logger.info("Begin to install chainer(cupy, chainer, chainermn) ...")
-    name = pkg_info["chainer"]["cupy"]["name"]
     version = pkg_info["chainer"]["cupy"]["version"]
     if (SysInfo.gpu and (SysInfo.os == TOOLSFORAI_OS_LINUX)):
-        pip_install_package(name, options, version)
+        if SysInfo.cuda == "8.0":
+            name = pkg_info["chainer"]["cupy"]["name"]["linux"]["cuda80"]
+        elif SysInfo.cuda == "9.0":
+            name = pkg_info["chainer"]["cupy"]["name"]["linux"]["cuda90"]
+        else:
+            name = pkg_info["chainer"]["cupy"]["name"]["linux"]["other"]
+        pip_install_package(name, options)
     elif (SysInfo.gpu and (SysInfo.os == TOOLSFORAI_OS_WIN)):
         try:
+            name = pkg_info["chainer"]["cupy"]["name"]["win"]
             cupy = importlib.import_module(name)
             if (not utils._version_compare(version, cupy.__version__)):
                 logger.warning("Cupy's version is too low, please manually upgrade cupy >= 2.0.0.")
