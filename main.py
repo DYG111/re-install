@@ -43,8 +43,9 @@ def main():
     install_pkg.pip_software_install(pkg_info, args.options, args.user, args.verbose)
     utils.delete_env("AITOOLS_CNTK_ROOT")
     utils.fix_directory_ownership()
-    install_res = "/".join(SysInfo.fail_install)
-    logger.info("Fail to install {0}. Please try to run installer script again!".format(install_res))
+    if len(SysInfo.fail_install != 0):
+        install_res = "/".join(SysInfo.fail_install)
+        logger.info("Fail to install {0}. Please try to run installer script again!".format(install_res))
     logger.info('Setup finishes.')
     input('Press enter to exit.')
 

@@ -145,7 +145,6 @@ def install_cntk_win(cntk_root):
 
     return suc
 
-
 # pip install package
 def pip_install_package(name, options, version, pkg=None):
     try:
@@ -196,261 +195,212 @@ def pip_uninstall_packge(name, options, version):
         logger.error("Fail to pip-uninstall {0}, unexpected error! Please try to run installer script again!".format(name))
         return False
 
-def pip_install_cntk(pkg_info, options):
-    if not ((SysInfo.os == TOOLSFORAI_OS_WIN) or (SysInfo.os == TOOLSFORAI_OS_LINUX)):
-        logger.info("CNTK(Python) can not be supported on your OS, we recommend 64-bit Windows-10 OS or 64-bit Linux OS.")
-        return
-    if SysInfo.gpu:
-        name = pkg_info["cntk"]["name"]["gpu"]
-        if SysInfo.cuda == "8.0":
-            version = pkg_info["cntk"]["cuda80"]
-            wheel_ver = SysInfo.python
-            arch = "win_amd64" if SysInfo.os == TOOLSFORAI_OS_WIN else "linux_x86_64"
-            gpu_type = "GPU" if SysInfo.gpu else "CPU-Only"
-            pkg = "https://cntk.ai/PythonWheel/{0}/cntk-{1}-cp{2}-cp{2}m-{3}.whl".format(gpu_type, version, wheel_ver, arch)
-            return pip_install_package(name, options, version, pkg)
-        elif SysInfo.cuda == "9.0":
-            version = pkg_info["cntk"]["version"]["cuda90"]
-            return pip_install_package(name, options, version)
+def parse_pkg_name(pkg_info):
+    name = ""
+    if isinstance(pkg_info["name"], str):
+        name = pkg_info["name"]
     else:
-        name = pkg_info["cntk"]["name"]["cpu"]
-        version = pkg_info["cntk"]["version"]["cpu"]
-        return pip_install_package(name, options, version)
-
-def pip_install_scipy(pkg_info, options):
-    logger.info("Begin to install scipy(numpy, scipy) ...")
-    name = pkg_info["scipy"]["numpy"]["name"]
-    version = pkg_info["scipy"]["numpy"]["version"]
-    if not pip_install_package(name, options, version):
-        logger.error("Pip_install_scipy terminated due to numpy installation failure.")
-        return False
-
-    name = pkg_info["scipy"]["scipy"]["name"]
-    version = pkg_info["scipy"]["scipy"]["version"]
-    if not pip_install_package(name, options, version):
-        logger.error("Pip_install_scipy terminated due to scipy installation failure.")
-        return False
-    return True
-
-def pip_install_tensorflow(pkg_info, options):
-    if SysInfo.gpu:
-        name = pkg_info["tensorflow"]["name"]["gpu"]
-        if SysInfo.cuda == "8.0":
-            if SysInfo.os == TOOLSFORAI_OS_WIN:
-                version = pkg_info["tensorflow"]["version"]["cuda80"]["win"]
-            elif SysInfo.os == TOOLSFORAI_OS_LINUX:
-                version = pkg_info["tensorflow"]["version"]["cuda80"]["linux"]
-        else:
-            version = pkg_info["tensorflow"]["version"]["cuda90"]
-    else:
-        name = pkg_info["tensorflow"]["name"]["cpu"]
-        version = pkg_info["tensorflow"]["version"]["cpu"]
-    return pip_install_package(name, options, version)
-
-def pip_install_pytorch(pkg_info, options):
-    name = pkg_info["pytorch"]["torch"]["name"]
-    version = pkg_info["pytorch"]["torch"]["version"]
-    if SysInfo.os == TOOLSFORAI_OS_MACOS:
-        pip_install_package(name, options, version)
-    elif SysInfo.os == TOOLSFORAI_OS_WIN or SysInfo.os == TOOLSFORAI_OS_LINUX:
-        wheel_ver = SysInfo.python
-        arch = "win_amd64" if SysInfo.os == TOOLSFORAI_OS_WIN else "linux_x86_64"
         if not SysInfo.gpu:
-            gpu_type = "cpu"
+            name = pkg_info["name"]["cpu"]
         else:
-            gpu_type = "cu80" if SysInfo.cuda == "8.0" else "cu90"
-        pkg = "http://download.pytorch.org/whl/{0}/{1}-{2}-cp{3}-cp{3}m-{4}.whl".format(gpu_type, name, version, wheel_ver, arch)
-        pip_install_package(name, options, version, pkg)
-    else:
-        logger.error("Fail to install pytorch.")
-        logger.warning("Pytorch installation can not be supported on your OS! We recommand 64-bit Windows-10, Linux and Macos.")
-
-    name = pkg_info["pytorch"]["torchvision"]["name"]
-    version = pkg_info["pytorch"]["torchvision"]["version"]
-    pip_install_package(name, options, version)
-
-def pip_install_keras(pkg_info, options):
-    name = pkg_info["Keras"]["name"]
-    version = pkg_info["Keras"]["version"]
-    return pip_install_package(name, options, version)
-
-def pip_install_caffe2(pkg_info, options):
-    if not (SysInfo.os == TOOLSFORAI_OS_WIN):
-        logger.warning("Fail to install caffe2. In non-Windows OS, you should manually install caffe2 from source.")
-        return
-    name = pkg_info["caffe2"]["name"]
-    version = pkg_info["caffe2"]["version"]
-    arch = "win_amd64"
-    wheel_ver = SysInfo.python
-    if SysInfo.gpu and SysInfo.cuda == "8.0":
-        pkg = "https://raw.githubusercontent.com/linmajia/ai-package/master/caffe2/{0}/caffe2_gpu-{0}-cp{1}-cp{1}m-{2}.whl".format(
-            version, wheel_ver, arch)
-    else:
-        pkg = "https://raw.githubusercontent.com/linmajia/ai-package/master/caffe2/{0}/caffe2-{0}-cp{1}-cp{1}m-{2}.whl".format(
-            version, wheel_ver, arch)
-    return pip_install_package(name, options, version, pkg)
-
-def pip_install_theano(pkg_info, options):
-    name = pkg_info["Theano"]["name"]
-    version = pkg_info["Theano"]["version"]
-    return pip_install_package(name, options, version)
-
-def pip_install_mxnet(pkg_info, options):
-    version = pkg_info["mxnet"]["version"]
-    if SysInfo.gpu:
-        if SysInfo.cuda == "8.0":
-            name = pkg_info["mxnet"]["name"]["gpu"]["cuda80"]
-        else:
-            name = pkg_info["mxnet"]["name"]["gpu"]["cuda90"]
-    else:
-        name =  pkg_info["mxnet"]["name"]["cpu"]
-
-    return pip_install_package(name, options, version)
-
-def pip_install_chainer(pkg_info, options):
-    # cupy installation for GPU linux
-    logger.info("Begin to install chainer(cupy, chainer, chainermn) ...")
-    version = pkg_info["chainer"]["cupy"]["version"]
-    if (SysInfo.gpu and (SysInfo.os == TOOLSFORAI_OS_LINUX)):
-        if SysInfo.cuda == "8.0":
-            name = pkg_info["chainer"]["cupy"]["name"]["linux"]["cuda80"]
-        elif SysInfo.cuda == "9.0":
-            name = pkg_info["chainer"]["cupy"]["name"]["linux"]["cuda90"]
-        else:
-            name = pkg_info["chainer"]["cupy"]["name"]["linux"]["other"]
-        pip_install_package(name, options)
-    elif (SysInfo.gpu and (SysInfo.os == TOOLSFORAI_OS_WIN)):
-        try:
-            name = pkg_info["chainer"]["cupy"]["name"]["win"]
-            cupy = importlib.import_module(name)
-            if (not utils._version_compare(version, cupy.__version__)):
-                logger.warning("Cupy's version is too low, please manually upgrade cupy >= 2.0.0.")
+            if isinstance(pkg_info["name"]["gpu"], str):
+                name = pkg_info["name"]["gpu"]
             else:
-                logger.info("cupy is already installed.")
-        except ImportError:
-            logger.warning("On windows, please manully install cupy. You can reference this link https://github.com/Microsoft/vs-tools-for-ai/blob/master/docs/prepare-localmachine.md#chainer.")
+                if SysInfo.cuda == "8.0":
+                    name = pkg_info["name"]["gpu"]["cuda80"]
+                elif SysInfo.cuda == "9.0":
+                    name = pkg_info["name"]["gpu"]["cuda90"]
+                else:
+                    name = pkg_info["name"]["gpu"]["other"]
+    return (name, True)
 
-    name = pkg_info["chainer"]["chainer"]["name"]
-    version = pkg_info["chainer"]["chainer"]["version"]
-    pip_install_package(name, options, version)
-
-    name = pkg_info["chainer"]["chainermn"]["name"]
-    version = pkg_info["chainer"]["chainermn"]["version"]
-    if not pip_install_package(name, options, version):
-        logger.warning("On Linux, in order to install chainermn, please first manually install libmpich-dev and then run installer script again.")
-
-def pip_install_converter(pkg_info, options):
-    logger.info("Begin to install converter(coremltools, onnx, tf2onnx, onnxmltools and winmltools) ...")
-    try:
-        #1 coremltools
-        name = pkg_info["converter"]["coremltools"]["name"]
-        version = pkg_info["converter"]["coremltools"]["version"]
+def parse_pkg_version(pkg_info):
+    version = ""
+    logger.debug("version: {0}".format(pkg_info["version"]))
+    if (pkg_info["version"] == None) or isinstance(pkg_info["version"], str):
+        version = pkg_info["version"]
+    else:
         if SysInfo.os == TOOLSFORAI_OS_WIN:
-            if SysInfo.git:
-                pkg = "git+https://github.com/apple/coremltools@v0.8"
-                pip_install_package(name, options, version, pkg)
+            if (pkg_info["version"] == None) or isinstance(pkg_info["version"]["win"], str):
+                version = pkg_info["version"]["win"]
             else:
-                SysInfo.fail_install.append("%s %s" % (name, version))
-                logger.warning("Fail to install {0}. Please manually install git and run installer script again.".format(name))
+                if not SysInfo.gpu:
+                    version = pkg_info["version"]["win"]["cpu"]
+                else:
+                    if (pkg_info["version"] == None) or isinstance(pkg_info["version"]["win"]["gpu"], str):
+                        version = pkg_info["version"]["win"]["gpu"]
+                    else:
+                        if SysInfo.cuda == "8.0":
+                            version = pkg_info["version"]["win"]["gpu"]["cuda80"]
+                        elif SysInfo.cuda == "9.0":
+                            version = pkg_info["version"]["win"]["gpu"]["cuda90"]
+                        else:
+                            version = pkg_info["version"]["win"]["gpu"]["other"]
+        elif SysInfo.os == TOOLSFORAI_OS_LINUX:
+            if (pkg_info["version"] == None) or isinstance(pkg_info["version"]["linux"], str):
+                version = pkg_info["version"]["linux"]
+            else:
+                if not SysInfo.gpu:
+                    version = pkg_info["version"]["linux"]["cpu"]
+                else:
+                    if (pkg_info["version"] == None) or isinstance(pkg_info["version"]["linux"]["gpu"], str):
+                        version = pkg_info["version"]["linux"]["gpu"]
+                    else:
+                        if SysInfo.cuda == "8.0":
+                            version = pkg_info["version"]["linux"]["gpu"]["cuda80"]
+                        elif SysInfo.cuda == "9.0":
+                            version = pkg_info["version"]["linux"]["gpu"]["cuda90"]
+                        else:
+                            version = pkg_info["version"]["linux"]["gpu"]["other"]
+        elif SysInfo.os == TOOLSFORAI_OS_MACOS:
+            return (None, False)
         else:
-            pip_install_package(name, options, version)
+            logger.error("Fail to parse config.yaml to get version. Your OS can't support auto-installation.")
+            return (None, False)
+    return (version, True)
 
-        #2 onnx
-        name = pkg_info["converter"]["onnx"]["name"]
-        version = pkg_info["converter"]["onnx"]["version"]
-        pip_install_package(name, options, version)
-
-        #3 tf2onnx
-        name = pkg_info["converter"]["tf2onnx"]["name"]
-        version = pkg_info["converter"]["tf2onnx"]["version"]
-        if not SysInfo.git:
-            utils.fail_install.append("%s %s" % (name, version))
-            logger.warning("Fail to install {0}. Please manually install git and run installer script again.".format(name))
+def parse_pkg_type(pkg_info):
+    type = ""
+    if isinstance(pkg_info["type"], str):
+        type = pkg_info["type"]
+    else:
+        if SysInfo.os == TOOLSFORAI_OS_WIN:
+            if isinstance(pkg_info["type"]["win"], str):
+                type = pkg_info["type"]["win"]
+            else:
+                if not SysInfo.gpu:
+                    type = pkg_info["type"]["win"]["cpu"]
+                else:
+                    if isinstance(pkg_info["type"]["win"]["gpu"], str):
+                        type = pkg_info["type"]["win"]["gpu"]
+                    else:
+                        if SysInfo.cuda == "8.0":
+                            type = pkg_info["type"]["win"]["gpu"]["cuda80"]
+                        elif SysInfo.cuda == "9.0":
+                            type = pkg_info["type"]["win"]["gpu"]["cuda90"]
+                        else:
+                            type = pkg_info["type"]["win"]["gpu"]["other"]
+        elif SysInfo.os == TOOLSFORAI_OS_LINUX:
+            if isinstance(pkg_info["type"]["linux"], str):
+                type = pkg_info["type"]["linux"]
+            else:
+                if not SysInfo.gpu:
+                    type = pkg_info["type"]["linux"]["cpu"]
+                else:
+                    if isinstance(pkg_info["type"]["linux"]["gpu"], str):
+                        type = pkg_info["type"]["linux"]["gpu"]
+                    else:
+                        if SysInfo.cuda == "8.0":
+                            type = pkg_info["type"]["linux"]["gpu"]["cuda80"]
+                        elif SysInfo.cuda == "9.0":
+                            type = pkg_info["type"]["linux"]["gpu"]["cuda90"]
+                        else:
+                            type = pkg_info["type"]["linux"]["gpu"]["other"]
+        elif SysInfo.os == TOOLSFORAI_OS_MACOS:
+            return (None, False)
         else:
-            pkg = "git+https://github.com/onnx/tensorflow-onnx.git@r0.1"
-            if utils.module_exists(name):
-                logger.info("{0} is already installed. We will uninstall it and upgrade to the latest version.".format(name))
-                pip_uninstall_packge(name, options, version)
-            pip_install_package(name, options, version, pkg)
+            logger.error("Fail to parse config.yaml to get type. Your OS can't support auto-installation.")
+            return (None, False)
+    return (type, True)
 
-        #4 onnxmltools
-        name = pkg_info["converter"]["onnxmltools"]["name"]
-        version = pkg_info["converter"]["onnxmltools"]["version"]
-        if utils.module_exists(name):
-            logger.info("{0} is already installed.".format(name))
+def parse_pkg_pkg(pkg_info):
+    pkg = ""
+    if isinstance(pkg_info["pkg"], str):
+        pkg = pkg_info["pkg"]
+    else:
+        if SysInfo.os == TOOLSFORAI_OS_WIN:
+            if isinstance(pkg_info["pkg"]["win"], str):
+                pkg = pkg_info["pkg"]["win"]
+            else:
+                if not SysInfo.gpu:
+                    if isinstance(pkg_info["pkg"]["win"]["cpu"], str):
+                        pkg = pkg_info["pkg"]["win"]["cpu"]
+                    else:
+                        if SysInfo.python == "35":
+                            pkg = pkg_info["pkg"]["win"]["cpu"]["python35"]
+                        elif SysInfo.python == "36":
+                            pkg = pkg_info["pkg"]["win"]["cpu"]["python36"]
+                        else:
+                            logger.Error("Fail to parse config.yaml to get pkg, we only support python35 or python36, please make sure python version is appropriate.")
+                            return (None, False)
+                else:
+                    if isinstance(pkg_info["pkg"]["win"]["gpu"], str):
+                        pkg = pkg_info["pkg"]["win"]["gpu"]
+                    else:
+                        if SysInfo.python == "35":
+                            if isinstance(pkg_info["pkg"]["win"]["gpu"]["python35"], str):
+                                pkg = pkg_info["pkg"]["win"]["gpu"]["python35"]
+                            else:
+                                if SysInfo.cuda == "8.0":
+                                    pkg = pkg_info["pkg"]["win"]["gpu"]["python35"]["cuda80"]
+                                elif SysInfo.cuda == "9.0":
+                                    pkg = pkg_info["pkg"]["win"]["gpu"]["python35"]["cuda90"]
+                                else:
+                                    pkg = pkg_info["pkg"]["win"]["gpu"]["python35"]["other"]
+                        elif SysInfo.python == "36":
+                            if isinstance(pkg_info["pkg"]["win"]["gpu"]["python36"], str):
+                                pkg = pkg_info["pkg"]["win"]["gpu"]["python36"]
+                            else:
+                                if SysInfo.cuda == "8.0":
+                                    pkg = pkg_info["pkg"]["win"]["gpu"]["python36"]["cuda80"]
+                                elif SysInfo.cuda == "9.0":
+                                    pkg = pkg_info["pkg"]["win"]["gpu"]["python36"]["cuda90"]
+                                else:
+                                    pkg = pkg_info["pkg"]["win"]["gpu"]["python36"]["other"]
+                        else:
+                            logger.Error("Fail to parse config.yaml to get pkg, we only support python35 or python36, please make sure python version is appropriate.")
+                            return (None, False)
+        elif SysInfo.os == TOOLSFORAI_OS_LINUX:
+            if isinstance(pkg_info["pkg"]["linux"], str):
+                pkg = pkg_info["pkg"]["linux"]
+            else:
+                if not SysInfo.gpu:
+                    if isinstance(pkg_info["pkg"]["linux"]["cpu"], str):
+                        pkg = pkg_info["pkg"]["linux"]["cpu"]
+                    else:
+                        if SysInfo.python == "35":
+                            pkg = pkg_info["pkg"]["linux"]["cpu"]["python35"]
+                        elif SysInfo.python == "36":
+                            pkg = pkg_info["pkg"]["linux"]["cpu"]["python36"]
+                        else:
+                            logger.Error(
+                                "Fail to parse config.yaml to get pkg, we only support python35 or python36, please make sure python version is appropriate.")
+                            return (None, False)
+                else:
+                    if isinstance(pkg_info["pkg"]["linux"]["gpu"], str):
+                        pkg = pkg_info["pkg"]["linux"]["gpu"]
+                    else:
+                        if SysInfo.python == "35":
+                            if isinstance(pkg_info["pkg"]["linux"]["gpu"]["python35"], str):
+                                pkg = pkg_info["pkg"]["linux"]["gpu"]["python35"]
+                            else:
+                                if SysInfo.cuda == "8.0":
+                                    pkg = pkg_info["pkg"]["linux"]["gpu"]["python35"]["cuda80"]
+                                elif SysInfo.cuda == "9.0":
+                                    pkg = pkg_info["pkg"]["linux"]["gpu"]["python35"]["cuda90"]
+                                else:
+                                    pkg = pkg_info["pkg"]["linux"]["gpu"]["python35"]["other"]
+                        elif SysInfo.python == "36":
+                            if isinstance(pkg_info["pkg"]["linux"]["gpu"]["python36"], str):
+                                pkg = pkg_info["pkg"]["win"]["gpu"]["python36"]
+                            else:
+                                if SysInfo.cuda == "8.0":
+                                    pkg = pkg_info["pkg"]["linux"]["gpu"]["python36"]["cuda80"]
+                                elif SysInfo.cuda == "9.0":
+                                    pkg = pkg_info["pkg"]["linux"]["gpu"]["python36"]["cuda90"]
+                                else:
+                                    pkg = pkg_info["pkg"]["linux"]["gpu"]["python36"]["other"]
+                        else:
+                            logger.Error(
+                                "Fail to parse config.yaml to get pkg, we only support python35 or python36, please make sure python version is appropriate.")
+                            return (None, False)
+        elif SysInfo.os == TOOLSFORAI_OS_MACOS:
+            return (None, False)
         else:
-            pip_install_package(name, options, version)
+            logger.error("Fail to parse config.yaml to get pkg. Your OS can't support auto-installation.")
+            return (None, False)
+    return (pkg, True)
 
-        #5 winmltools
-        name = pkg_info["converter"]["winmltools"]["name"]
-        version = pkg_info["converter"]["winmltools"]["version"]
-        if utils.module_exists(name):
-            logger.info("{0} is already installed.".format(name))
-        else:
-            pip_install_package(name, options, version)
-    except Exception as e:
-        logger.error("Fail to install converter, unexpected error! Please run installer again!")
-
-def pip_install_ml_software(pkg_info, options):
-    logger.info("Begin to install ml software(scikit-learn, xgboost and libsvm) ...")
-
-    #1 scikit-learn
-    name = pkg_info["ml_software"]["scikit-learn"]["name"]
-    version = pkg_info["ml_software"]["scikit-learn"]["version"]
-    pip_install_package(name, options, version)
-
-    #2 xgboost
-    name = pkg_info["ml_software"]["xgboost"]["name"]
-    version = pkg_info["ml_software"]["xgboost"]["version"]
-    if SysInfo.os != TOOLSFORAI_OS_WIN:
-        if not pip_install_package(name, options, version):
-            logger.warning("In order to install xgboost, C++ compiler is needed.")
-    else:
-        wheel_ver = SysInfo.python
-        arch = "win_amd64"
-        pkg = "https://raw.githubusercontent.com/linmajia/ai-package/master/xgboost/{0}/xgboost-{0}-cp{1}-cp{1}m-{2}.whl".format(version, wheel_ver, arch)
-        pip_install_package(name, options, version, pkg)
-
-    #3 libsvm
-    name = pkg_info["ml_software"]["libsvm"]["name"]
-    version = pkg_info["ml_software"]["libsvm"]["version"]
-    if SysInfo.os != TOOLSFORAI_OS_WIN:
-        logger.warning(
-            "Fail to install libsvm. On Linux or Mac, in order to install {0}=={1}, please manually download source code and install it.".format(
-                name, version))
-    else:
-        wheel_ver = SysInfo.python
-        arch = "win_amd64"
-        pkg = "https://raw.githubusercontent.com/linmajia/ai-package/master/libsvm/{0}/libsvm-{0}-cp{1}-cp{1}m-{2}.whl".format(version, wheel_ver, arch)
-        logger.debug("Pip install libsvm from {0}".format(pkg))
-        pip_install_package(name, options, version, pkg)
-
-def pip_install_extra_software(pkg_info, options):
-    logger.info("Begin to install extra software(jupyter, matplotlib, and pandas) ...")
-
-    #1 jupyter
-    name = pkg_info["extra_software"]["jupyter"]["name"]
-    version = pkg_info["extra_software"]["jupyter"]["version"]
-    if utils.module_exists(name):
-        logger.info("{0} is already installed.".format(name))
-    else:
-        pip_install_package(name, options, version)
-
-    #2 matplotlib
-    name = pkg_info["extra_software"]["matplotlib"]["name"]
-    version = pkg_info["extra_software"]["matplotlib"]["version"]
-    if utils.module_exists(name):
-        logger.info("{0} is already installed.".format(name))
-    else:
-        pip_install_package(name, options, version)
-
-    #3 pandas
-    name = pkg_info["extra_software"]["pandas"]["name"]
-    version = pkg_info["extra_software"]["pandas"]["version"]
-    if utils.module_exists(name):
-        logger.info("{0} is already installed.".format(name))
-    else:
-        pip_install_package(name, options, version)
 
 def pip_software_install(pkg_info, options, user, verbose):
     pip_ops = []
@@ -460,16 +410,32 @@ def pip_software_install(pkg_info, options, user, verbose):
         pip_ops = ["--user"]
     if not verbose:
         pip_ops.append("-q")
-    if not pip_install_scipy(pkg_info, pip_ops):
-        return
-    pip_install_cntk(pkg_info, pip_ops)
-    pip_install_tensorflow(pkg_info, pip_ops)
-    pip_install_pytorch(pkg_info, pip_ops)
-    pip_install_mxnet(pkg_info, pip_ops)
-    pip_install_chainer(pkg_info, pip_ops)
-    pip_install_theano(pkg_info, pip_ops)
-    pip_install_keras(pkg_info, pip_ops)
-    pip_install_caffe2(pkg_info, pip_ops)
-    pip_install_ml_software(pkg_info, pip_ops)
-    pip_install_converter(pkg_info, pip_ops)
-    pip_install_extra_software(pkg_info, pip_ops)
+    i = 0
+    for pkg_item in pkg_info["pip"]:
+        i = i + 1
+        name, status1 = parse_pkg_name(pkg_item)
+        logger.debug("i: {0}, name: {1}".format(i, name))
+        version, status2 = parse_pkg_version(pkg_item)
+        logger.debug("i: {0}, version: {1}".format(i, version))
+        type, status3 = parse_pkg_type(pkg_item)
+        logger.debug("i: {0}, name: {1}, version: {2}, type: {3}".format(i, name, version, type))
+        if status1 and status2 and status3:
+            if type == "0":
+                logger.error("Your OS can't support auto-installation")
+            elif type == "1":
+                pip_install_package(name, pip_ops, version)
+            elif type == "2":
+                pkg, status4 = parse_pkg_pkg(pkg_item)
+                if status4:
+                    pip_install_package(name, pip_ops, version, pkg)
+                else:
+                    logger.error("Fail to parse config.yaml to get pkg.")
+            elif type == "3":
+                pip_uninstall_packge(name, pip_ops, version)
+                pkg, status4 = parse_pkg_pkg(pkg_item)
+                if status4:
+                    pip_install_package(name, pip_ops, version, pkg)
+                else:
+                    logger.error("Fail to parse config.yaml to get pkg.")
+        else:
+            logger.error("Fail to parse config.yaml to get pkg.")

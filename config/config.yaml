@@ -1,66 +1,235 @@
-# package details
-cntk:
-    name: {gpu: cntk-gpu, cpu: cntk}
-    version:
-        cuda80: 2.3.1
-        cuda90: 2.5.1
-        cpu: 2.5.1
+# note: describe python dependency package information
 
-scipy:
-    numpy: {name: numpy, version: 1.14.2}
-    scipy: {name: scipy, version: 1.0.1}
+# 1. required items: "name" "version" "type"      optional items: "pkg" "log"
+# 2. name tags sequence: name -> cpu/gpu -> cuda80/cuda90/other
+# 3. version tags sequence: version -> win/linux -> cpu/gpu -> cuda80/cuda90/other
+# 4. type tags sequence: type -> win/linux/macos -> cpu/gpu -> cuda80/cuda90/other
+# 5. pkg tags sequence: pkg -> win/linux/macos -> cpu/gpu -> python35/python36 -> cuda80/cuda90/other
+# 6. the meaning of type:
+#  - type == 0: auto-installation can't be supported
+#  - type == 1: pip install name ==/>=/<= version
+#  - type == 2: pip install "https..."/"git + https..."
+#  - type == 3: first pip uninstall, and then pip install pkg
+# 7. for "cuda80/cuda90/other", when cuda is not installed, we choose "other"
 
-tensorflow:
-    name: {gpu: tensorflow-gpu, cpu: tensorflow}
-    version:
-        cuda80: {win: 1.4.0, linux: 1.4.1}
-        cuda90: 1.5.0
-        cpu: 1.5.0
+# Dependency package installed by pip
+pip:
+    - # cntk
+        name: {cpu: cntk, gpu: cntk-gpu}
+        version:
+              win:
+                  cpu: 2.5.1
+                  gpu: {cuda80: 2.3.1, cuda90: 2.5.1, other: 2.5.1}
+              linux:
+                  cpu: 2.5.1
+                  gpu: {cuda80: 2.3.1, cuda90: 2.5.1, other: 2.5.1}
+        type:
+            win:
+                cpu: "1"
+                gpu: {cuda80: "2", cuda90: "1", other: "1"}
+            linux:
+                cpu: "1"
+                gpu: {cuda80: "2", cuda90: "1", other: "1"}
+            macos: "0"
+        pkg:
+            win:
+                cpu:
+                    python35: https://cntk.ai/PythonWheel/CPU-Only/cntk-2.3.1-cp35-cp35m-win_amd64.whl
+                    python36: https://cntk.ai/PythonWheel/CPU-Only/cntk-2.3.1-cp36-cp36m-win_amd64.whl
+                gpu:
+                    python35: https://cntk.ai/PythonWheel/GPU/cntk-2.3.1-cp35-cp35m-win_amd64.whl
+                    python36: https://cntk.ai/PythonWheel/GPU/cntk-2.3.1-cp35-cp35m-win_amd64.whl
+        log:
+            fail_install: CNTK(Python) can not be supported on your OS, we recommend 64-bit Windows-10 OS or 64-bit Linux OS.
+    - # numpy for scipy
+        name: numpy
+        version: 1.14.2
+        type: "1"
+        log:
+            fail_install: Pip_installation terminated due to numpy installation failure.
+    - # scipy
+        name: scipy
+        version: 1.0.1
+        type: "1"
+        log:
+            fail_install: Pip_installation terminated due to scipy installation failure.
+    - # tensorflow
+        name: {cpu: tensorflow, gpu: tensorflow-gpu}
+        version:
+            win:
+                cpu: 1.5.0
+                gpu: {cuda80: 1.4.0, cuda90: 1.5.0, other: 1.5.0}
+            linux:
+                cpu: 1.5.0
+                gpu: {cuda80: 1.4.1, cuda90: 1.5.0, other: 1.5.0}
+        type: "1"
+    - # torch for pytorch
+        name: torch
+        version: 0.4.0
+        type:
+            win: "2"
+            linux: "2"
+            macos: "1"
+        pkg:
+            win:
+                cpu:
+                    python35: http://download.pytorch.org/whl/cpu/torch-0.4.0-cp35-cp35m-win_amd64.whl
+                    python36: http://download.pytorch.org/whl/cpu/torch-0.4.0-cp36-cp36m-win_amd64.whl
+                gpu:
+                    python35:
+                         cuda80:  http://download.pytorch.org/whl/cu80/torch-0.4.0-cp35-cp35m-win_amd64.whl
+                         cuda90:  http://download.pytorch.org/whl/cu90/torch-0.4.0-cp35-cp35m-win_amd64.whl
+                         other:   http://download.pytorch.org/whl/cu90/torch-0.4.0-cp35-cp35m-win_amd64.whl
+                    python36:
+                         cuda80:  http://download.pytorch.org/whl/cu80/torch-0.4.0-cp36-cp36m-win_amd64.whl
+                         cuda90:  http://download.pytorch.org/whl/cu90/torch-0.4.0-cp36-cp36m-win_amd64.whl
+                         other:   http://download.pytorch.org/whl/cu90/torch-0.4.0-cp36-cp36m-win_amd64.whl
+            linux:
+                cpu:
+                    python35: http://download.pytorch.org/whl/cpu/torch-0.4.0-cp35-cp35m-linux_x86_64.whl
+                    python36: http://download.pytorch.org/whl/cpu/torch-0.4.0-cp36-cp36m-linux_x86_64.whl
+                gpu:
+                    python35:
+                         cuda80:  http://download.pytorch.org/whl/cu80/torch-0.4.0-cp35-cp35m-linux_x86_64.whl
+                         cuda90:  http://download.pytorch.org/whl/cu90/torch-0.4.0-cp35-cp35m-linux_x86_64.whl
+                         other: http://download.pytorch.org/whl/cu90/torch-0.4.0-cp35-cp35m-linux_x86_64.whl
+                    python36:
+                         cuda80:  http://download.pytorch.org/whl/cu80/torch-0.4.0-cp36-cp36m-linux_x86_64.whl
+                         cuda90:  http://download.pytorch.org/whl/cu90/torch-0.4.0-cp36-cp36m-linux_x86_64.whl
+                         other:  http://download.pytorch.org/whl/cu90/torch-0.4.0-cp36-cp36m-linux_x86_64.whl
 
-pytorch:
-    torch: {name: torch, version: 0.4.0}
-    torchvision: {name: torchvision, version: ~}
-
-Keras:
-    name: Keras
-    version: 2.1.5
-
-caffe2:
-    name: caffe2
-    version: 0.8.1
-
-Theano:
-    name: Theano
-    version: 1.0.1
-
-mxnet:
-    name:
-        gpu: {cuda80: mxnet-cu80, cuda90: mxnet-cu90}
-        cpu: mxnet
-    version: 1.1.0.post0
-
-chainer:
-    cupy:
+    - # torchvision for pytorch
+        name: torchvision
+        version: ~
+        type: "1"
+    - # Keras
+        name: Keras
+        version: 2.1.5
+        type: "1"
+    - # caffe2
+        name: caffe2
+        version: 0.8.1
+        type:
+            win: "2"
+            linux: "0"
+            macos: "0"
+        pkg:
+            win:
+                cpu:
+                    python35: https://raw.githubusercontent.com/linmajia/ai-package/master/caffe2/0.8.1/caffe2-0.8.1-cp35-cp35m-win_amd64.whl
+                    python36: https://raw.githubusercontent.com/linmajia/ai-package/master/caffe2/0.8.1/caffe2-0.8.1-cp36-cp36m-win_amd64.whl
+                gpu:
+                    python35:
+                        cuda80: https://raw.githubusercontent.com/linmajia/ai-package/master/caffe2/0.8.1/caffe2_gpu-0.8.1-cp35-cp35m-win_amd64.whl
+                        cuda90: https://raw.githubusercontent.com/linmajia/ai-package/master/caffe2/0.8.1/caffe2-0.8.1-cp35-cp35m-win_amd64.whl
+                        other: https://raw.githubusercontent.com/linmajia/ai-package/master/caffe2/0.8.1/caffe2-0.8.1-cp35-cp35m-win_amd64.whl
+                    python36:
+                        cuda80: https://raw.githubusercontent.com/linmajia/ai-package/master/caffe2/0.8.1/caffe2_gpu-0.8.1-cp36-cp36m-win_amd64.whl
+                        cuda90: https://raw.githubusercontent.com/linmajia/ai-package/master/caffe2/0.8.1/caffe2-0.8.1-cp36-cp36m-win_amd64.whl
+                        other: https://raw.githubusercontent.com/linmajia/ai-package/master/caffe2/0.8.1/caffe2-0.8.1-cp36-cp36m-win_amd64.whl
+        log:
+            fail_install: In non-Windows OS, you need to manually install caffe2 from source.
+    - # Theano
+        name: Theano
+        version: 1.0.1
+        type: "1"
+    - # mxnet
         name:
-            win: cupy
-            linux: {cuda80: cupy-cuda80, cuda90: cupy-cuda90, other: cupy}
+            cpu: mxnet
+            gpu: {cuda80: mxnet-cu80, cuda90: mxnet-cu90, other: mxnet-cu90}
+        version: 1.1.0.post0
+        type: "1"
+    - # cupy for chainer
+        name:
+            cpu: ~
+            gpu: {cuda80: cupy-cuda80, cuda90: cupy-cuda90, other: cupy}
         version: 4.0.0
-    chainer: {name: chainer, version: 4.0.0}
-    chainermn: {name: chainermn, version: ~}
-
-converter:
-    coremltools: {name: coremltools, version: ~}
-    onnx: {name: onnx, version: 1.1.2}
-    tf2onnx: {name: tf2onnx, version: 0.0.0.1}
-    onnxmltools: {name: onnxmltools, version: ~}
-    winmltools: {name: winmltools, version: ~}
-
-ml_software:
-    scikit-learn: {name: scikit-learn, version: 0.19.1}
-    xgboost: {name: xgboost, version: 0.71}
-    libsvm: {name: libsvm, version: 3.22}
-
-extra_software:
-    jupyter: {name: jupyter, version: ~}
-    matplotlib: {name: matplotlib, version: ~}
-    pandas: {name: pandas, version: ~}
+        type:
+            win: "0"
+            linux: {cpu: "0", gpu: "1"}
+            macos: "0"
+        log:
+            fail_install: On windows, please manully install cupy. You can reference this link https://github.com/Microsoft/vs-tools-for-ai/blob/master/docs/prepare-localmachine.md#chainer.
+    - # chainer
+        name: chainer
+        version: 4.0.0
+        type: "1"
+    - # chainermn
+        name: chainermn
+        version: ~
+        type: "1"
+        log:
+            fail_install: On Linux, in order to install chainermn, please first manually install libmpich-dev and run installer script again.
+    - # coremltools for converter
+        name: coremltools
+        version: ~
+        type:
+            win: "2"
+            linux: "1"
+            macos: "1"
+        pkg: git+https://github.com/apple/coremltools@v0.8
+    - # onnx for converter
+        name: onnx
+        version: 1.1.2
+        type: "1"
+    - # tf2onnx
+        name: tf2onnx
+        version: 0.0.0.1
+        type: "3"
+        pkg: git+https://github.com/onnx/tensorflow-onnx.git@r0.1
+    - # onnxmltools for converter
+        name: onnxmltools
+        version: ~
+        type: "1"
+    - # winmltools for converter
+        name: winmltools
+        version: ~
+        type: "1"
+    - # scikit-learn for ml_software
+        name: scikit-learn
+        version: 0.19.1
+        type: "1"
+    - # xgboost for ml_software
+        name: xgboost
+        version: !!str 0.71
+        type:
+            win: "2"
+            linux: "1"
+            macos: "1"
+        pkg:
+            win:
+                cpu:
+                    python35: https://raw.githubusercontent.com/linmajia/ai-package/master/xgboost/0.71/xgboost-0.71-cp35-cp35m-win_amd64.whl
+                    python36: https://raw.githubusercontent.com/linmajia/ai-package/master/xgboost/0.71/xgboost-0.71-cp36-cp36m-win_amd64.whl
+                gpu:
+                    python35: https://raw.githubusercontent.com/linmajia/ai-package/master/xgboost/0.71/xgboost-0.71-cp35-cp35m-win_amd64.whl
+                    python36: https://raw.githubusercontent.com/linmajia/ai-package/master/xgboost/0.71/xgboost-0.71-cp36-cp36m-win_amd64.whl
+    - # libsvm for ml_software
+        name: libsvm
+        version: !!str 3.22
+        type:
+            win: "2"
+            linux: "0"
+            macos: "0"
+        pkg:
+            win:
+                cpu:
+                    python35: https://raw.githubusercontent.com/linmajia/ai-package/master/libsvm/3.22/libsvm-3.22-cp35-cp35m-win_amd64.whl
+                    python36: https://raw.githubusercontent.com/linmajia/ai-package/master/libsvm/3.22/libsvm-3.22-cp36-cp36m-win_amd64.whl
+                gpu:
+                    python35: https://raw.githubusercontent.com/linmajia/ai-package/master/libsvm/3.22/libsvm-3.22-cp35-cp35m-win_amd64.whl
+                    python36: https://raw.githubusercontent.com/linmajia/ai-package/master/libsvm/3.22/libsvm-3.22-cp36-cp36m-win_amd64.whl
+        log:
+            fail_install: On Linux or Mac, in order to install {0}=={1}, please manually download source code and install it.
+    - # jupyter for extra_software
+        name: jupyter
+        version: ~
+        type: "1"
+    - # matplotlib for extra_software
+        name: matplotlib
+        version: ~
+        type: "1"
+    - # pandas for extra_software
+        name: pandas
+        version: ~
+        type: "1"
